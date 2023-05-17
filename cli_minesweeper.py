@@ -61,8 +61,8 @@ def output(arr):
 
 
 
-# проверка выигрыша
-def victory_check(bomb_coord, mark_coord):
+# проверка все ли бомбы отмечены
+def bomb_check(bomb_coord, mark_coord, num_of_boms):
     global counter
     counter = 0
     for coord in mark_coord:
@@ -70,6 +70,20 @@ def victory_check(bomb_coord, mark_coord):
             counter += 1
         else:
             break
+    
+    if counter == num_of_bombs:
+        return True
+    else:
+        return False
+    
+# проверка все ли клетки открыты
+def cell_check(arr):
+    for row in arr:
+        for col in row:
+            if col == ' ':
+                return False
+            
+    return True
 
 
 #==========================================================
@@ -149,13 +163,7 @@ while True:
             mark_coord.append([x, y])
         else:
             print('поле уже открыто')
-
-        victory_check(bomb_coord, mark_coord)
         output(arr)
-
-        if counter == num_of_bombs:
-            print('Победа!!!!')
-            break
 
     elif method == 3:
         if arr[x][y] == 'X':
@@ -167,7 +175,10 @@ while True:
 
     else:
         print('действие может быть равен только 1, 2 или 3')
-
+        
+    if bomb_check(bomb_coord, mark_coord, num_of_bombs) and cell_check(arr):
+        print('ПОБЕДА!!!!')
+        break
     
     method = int(input("""
     Введите действие:
