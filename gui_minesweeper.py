@@ -7,7 +7,7 @@ import pickle
 
 # объявляем все необходимые переменные и массивы
 num_of_rows = 10
-num_of_bombs = 5
+num_of_bombs = 10
 bomb_coord = [] # хранит координаты бомб
 mark_coord = [] # хранит координаты отмеченных клеток
 arr = []
