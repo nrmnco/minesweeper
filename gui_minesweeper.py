@@ -12,7 +12,7 @@ bomb_coord = [] # хранит координаты бомб
 mark_coord = [] # хранит координаты отмеченных клеток
 arr = []
 size = 720
-screen = pg.display.set_mode((size, size))
+screen = pg.display.set_mode((size, size+50))
 pg.display.set_caption('Minesweeper')
 clock = pg.time.Clock()
 running = True
