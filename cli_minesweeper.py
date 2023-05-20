@@ -1,5 +1,5 @@
 import random as r
-
+import os
 
 
 #==========================================================
@@ -62,7 +62,7 @@ def output(arr):
 
 
 # проверка все ли бомбы отмечены
-def bomb_check(bomb_coord, mark_coord, num_of_boms):
+def bomb_check(bomb_coord, mark_coord, num_of_bombs):
     global counter
     counter = 0
     for coord in mark_coord:
@@ -98,34 +98,41 @@ def cell_check(arr):
 #=====================ОСНОВНОЙ КОД=========================
 #==========================================================
 
-num_of_rows = -1
+os.system('cls')
+
+# объявляем все необходимые переменные и массивы
+num_of_rows = -1 # количество строк и столбцов
 while num_of_rows < 10 or num_of_rows > 30:
-    num_of_rows = int(input('введите количество строк и столбцов '))
-num_of_bombs = 0
+    num_of_rows = int(input('введите количество строк и столбцов(от 10 до 30) '))
+num_of_bombs = 0 # количество бомб
 while num_of_bombs < 1 or num_of_bombs > num_of_rows**2 // 4:
-    num_of_bombs = int(input('введите количество бомб на игровом поле '))   
-method = 1
+    num_of_bombs = int(input('введите количество бомб на игровом поле(не менее 1 и не более 25% от всех клеток) '))   
+method = 1 # номер действия
 counter = 0
 arr = [[' ' for x in range(num_of_rows)] for i in range(num_of_rows)] # хранит то что игрок будет видеть
 arr_with_values = [[0 for x in range(num_of_rows)] for i in range(num_of_rows)] # хранит расположения бомб, цифры и тд
-bomb_coord = []
-mark_coord = []
+bomb_coord = [] # хранит координаты бомб
+mark_coord = [] # хранит координаты отмеченных клеток
 
 
+
+output(arr)
 # первый выбор клетки
 x, y = map(int, input('введите координаты x и y ').split())
+angle_ind = [[x-1,y-1], [x+1, y-1], [x-1, y+1], [x+1, y+1], [x, y-1], [x, y+1], [x-1, y], [x+1, y], [x, y]]
 
-angle_ind = [[x-1,y-1], [x+1, y-1], [x-1, y+1], [x+1, y+1], [x, y-1], [x, y+1], [x-1, y], [x+1, y]]
 
-# заполнение игрового поля бомбами и цифрами  and arr_with_values[x_bomb][y_bomb] == -1
+
+
+# заполнение игрового поля бомбами и цифрами
 for i in range(num_of_bombs):
     x_bomb = r.randint(0, num_of_rows-1)
     y_bomb = r.randint(0, num_of_rows-1)
 
     # делаем так что бомбы не находятся вокруг клетки выбранной в первый раз и чтобы координаты бомб не совпадали
-    while [x_bomb, y_bomb] in angle_ind or arr_with_values[x_bomb][y_bomb] == -1: # проверка на расположение по углам
-        x_bomb = r.randint(0, num_of_rows-1)
-        y_bomb = r.randint(0, num_of_rows-1)
+    while [x_bomb, y_bomb] in angle_ind or arr_with_values[x_bomb][y_bomb] == -1:
+        empty_cells = [(x, y) for x in range(num_of_rows) for y in range(num_of_rows) if arr_with_values[x][y] != -1]
+        x_bomb, y_bomb = r.choice(empty_cells)
 
     arr_with_values[x_bomb][y_bomb] = -1
     bomb_coord.append([x_bomb, y_bomb])
@@ -143,51 +150,77 @@ for i in range(num_of_bombs):
                         pass
 
 
+
+# игра после первого выбора клетки
 while True:
+    os.system('cls')
+    # открытие клетки
     if method == 1:
         if arr_with_values[x][y] == 0:
             open_cells(x, y)
         else:
             arr[x][y] = arr_with_values[x][y]
 
-        output(arr)
 
         # проверка не попал ли игрок на мину
         if arr_with_values[x][y] == -1:
-            print('поражение')
+            output(arr)
+            print('поражение ;C')
             break
-
+    
+    # отметка клетки
     elif method == 2:
         if arr[x][y] == ' ':
             arr[x][y] = 'X'
             mark_coord.append([x, y])
         else:
             print('поле уже открыто')
-        output(arr)
 
+    # удаление отметки клетки
     elif method == 3:
         if arr[x][y] == 'X':
             arr[x][y] = ' '
             mark_coord.remove([x, y])
-            output(arr)
+
         else:
             print('эта клетка не отмечена')
 
-    else:
-        print('действие может быть равен только 1, 2 или 3')
-        
+    elif method not in [1, 2, 3, 4]:
+        print('номер действия может быть равен только 1, 2, 3 или 4')
+
+    output(arr)
+
     if bomb_check(bomb_coord, mark_coord, num_of_bombs) and cell_check(arr):
         print('ПОБЕДА!!!!')
         break
+    try:
+        method = int(input("""
+        Введите номер действия:
+        1 - открыть клетку
+        2 - отметить клетку
+        3 - удалить отметку с клетки
+        4 - выйти из игры
+        действие - """))
+    except:
+        continue
+    # выход из игры
+    if method == 4:
+        check = input('вы уверены?(да или нет) ')
+        if check == 'да':
+            break
+        else:
+            continue
+    elif method not in [1, 2, 3, 4]:
+        continue
     
-    method = int(input("""
-    Введите действие:
-    1 - открыть клетку
-    2 - отметить клетку
-    3 - удалить отметку с клетки
-    действие - """))
-    x, y = map(int, input('введите координаты x и y ').split())
-        
+
+    try:
+        x, y = map(int, input('введите координаты x и y ').split())
+    except:
+        print('введите два числа в диапазоне от 0 до {}и в виде "число1 число2"'.format(num_of_rows))
+
+
+
 #==========================================================
 #=====================ОСНОВНОЙ КОД=========================
 #==========================================================
